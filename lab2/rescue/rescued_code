@@ -1,0 +1,43 @@
+ 79         if (rp == NULL)
+ 80         {
+ 81                 perror("stream-talk-client: connect");
+ 82                 exit(1);
+ 83         }
+ 84         freeaddrinfo(result);
+ 85 
+ 86         if ((file_desc = open(file_name, 0)) == -1)
+ 87         {
+ 88                 printf("File open fail\n");
+ 89                 exit(1);
+ 90         }
+ 91 
+ 92         /* Main loop: get and send lines of text */
+ 93 
+ 94         while ( (bytes_read = read(file_desc, (void *) &buf, MAX_LINE) != 0) );
+ 95         {
+ 96                 send_buf = (char *) &buf;
+ 97 
+ 98                 if (bytes_read == -1)
+ 99                 {
+100                         printf("File Read Error\n");
+101                         exit(1);
+102                 }
+103 
+104                 do
+105                 {
+106                         if ((bytes_sent = send(s, (void *) send_buf, bytes_read,0)) < 0)
+107                         {
+108                                 printf("File send fail\n");
+109                                 exit(1);
+110                         }
+111                         send_buf = send_buf + bytes_sent;
+112                         bytes_read = bytes_read - bytes_sent;
+113 
+114                 }while(bytes_sent >= bytes_read);
+115         }
+116 
+117         close(s);
+118         close(file_desc);
+119 
+120         return 0;
+121 }
